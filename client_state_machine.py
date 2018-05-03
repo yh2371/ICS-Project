@@ -108,26 +108,7 @@ class ClientSM:
                 
                 #MIDI creation action
                 elif my_msg == "m":
-                    while my_msg != "back":
-                        print(original)
-                        my_msg = input()
-                        if len(my_msg) > 0:
-                            if my_msg == "i":
-                                print(instruments)
-                            elif my_msg == "k":
-                                print(keyboard)
-                            elif my_msg[0] == "w":
-                                l = my_msg[1:].split(";")
-                                melody = l[0].strip()
-                                instrument = l[1].strip()
-                                name = l[2].strip()
-                                mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
-                                if json.loads(myrecv(self.s))["status"] == "failure":
-                                    print("ERROR: Unable to create MIDI. Please try again.\n")
-                                else:
-                                    print("Success! MIDI saved!")
-                                    print("New creation:", json.loads(myrecv(self.s)["info"]))
-                    self.out_msg += menu
+                    self.state = S_MUSIC
                 else:
                     self.out_msg += menu
 
@@ -153,17 +134,11 @@ class ClientSM:
                     self.state = S_LOGGEDIN
                     self.peer = ''
                 elif my_msg == "share original":
-                    f = open("creations.txt", r)
-                    print("++++++Archive of original music is shown below:\n")
-                    print(f.read())
-                    f.close()
-                    number = input("Enter the number of original piece you want to share: ")                    
-                    mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": number}))
+                    self.state = S_CHATTING_O
+                    
                 elif my_msg == "share demo":
-                    print("++++++Archive of demo music is shown below:\n")
-                    print(archive)
-                    number = input("Enter the number of demo piece you want to share: ")                    
-                    mysend(self.s, json.dumps({"action": "demo", "from": "[" + self.me + "]", "number": number}))
+                    self.state = S_CHATTING_D
+                    
             if len(peer_msg) > 0:    # peer's stuff, coming in
                 peer_msg = json.loads(peer_msg)
                 if peer_msg["action"] == "connect":
@@ -193,6 +168,64 @@ class ClientSM:
             # Display the menu again
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu
+        
+        
+        elif self.state == S_MUSIC:
+            
+            if len(my_msg) > 0:
+                self.out_msg += original
+                if my_msg == "i":
+                    self.out_msg += instruments
+                elif my_msg == "k":
+                    self.out_msg += keyboard
+                elif my_msg[0] == "w":
+                    try:
+                        l = my_msg[1:].split(";")
+                        melody = l[0].strip()
+                        instrument = l[1].strip()
+                        name = l[2].strip()
+                        mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
+                        if json.loads(myrecv(self.s))["status"] == "failure":
+                            self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"
+                        else:
+                            self.out_msg += "Success! MIDI saved!"
+                            self.out_msg += "New creation:\n"
+                            self.out_msg += json.loads(myrecv(self.s)["info"])
+                    except:
+                        self.out_msg += original
+                elif my_msg == 'back':
+                    self.state =S_LOGGEDIN
+                else:
+                    self.out_msg += original
+            if self.state == S_LOGGEDIN:
+                self.out_msg += menu
+            
+        elif self.state == S_CHATTING_O:
+            f = open("creations.txt", "r")   
+            content = f.read()
+            f.close()
+            if len(my_msg)>0:
+                self.out_msg += "++++++Archive of original music is shown below:\n"
+                self.out_msg += content
+                if my_msg.isdigit():
+                    mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": my_msg.strip()}))
+                    if json.loads(myrecv(self.s))["status"] == "failure":
+                        self.out_msg += "ERROR. Unable to send the original music. Try again.\n"
+                    else:
+                        self.out_msg += "Success! Original sent!"
+                
+                
+        elif self.state == S_CHATTING_D:
+            if len(my_msg)>0:
+                self.out_msg +="++++++Archive of demo music is shown below:\n"
+                self.out_msg += archive
+                if my_msg.isdigit():
+                    mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": my_msg.strip()}))
+                    if json.loads(myrecv(self.s))["status"] == "failure":
+                        self.out_msg += "ERROR. Unable to send the demo music. Try again.\n"
+                    else:
+                        self.out_msg += "Success! Demo sent!"
+
 #==============================================================================
 # invalid state
 #==============================================================================

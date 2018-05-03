@@ -199,7 +199,7 @@ class Server:
                     midi = music_maker.create_midi(notes, instrument)
                     f = open("creations.txt", "r")
                     content = f.read()
-                    lines = f.reaedlines()
+                    lines = f.readlines()
                     i = len(lines) + 1
                     content += (str(i) + "; " + name + "; " + from_name + "; " + instrument + "; " + melody + "\n")
                     f.close()
@@ -209,7 +209,7 @@ class Server:
                     mysend(from_sock, json.dumps({"action": "create", "status": "failure"}))
                     
                 else:
-                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "info": content, "name": name}))  
+                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "info": content, "name": name}))
                        
             elif msg["action"] == "original":
                 from_name = self.logged_sock2name[from_sock]
