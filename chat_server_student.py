@@ -199,7 +199,7 @@ class Server:
                     midi = music_maker.create_midi(notes, instrument)
                     f = open("creations.txt", "r")
                     content = f.read()
-                    lines = f.reaedlines()
+                    lines = f.readlines()
                     i = len(lines) + 1
                     content += (str(i) + "; " + name + "; " + from_name + "; " + instrument + "; " + melody + "\n")
                     f.close()

@@ -115,7 +115,7 @@ class ClientSM:
                     #    print(original)
                     #    my_msg = input()
 
-                    self.out_msg += menu
+                    
                 else:
                     self.out_msg += menu
 
@@ -185,22 +185,25 @@ class ClientSM:
                 elif my_msg == "k":
                     self.out_msg += keyboard
                 elif my_msg[0] == "w":
-                    l = my_msg[1:].split(";")
-                    melody = l[0].strip()
-                    instrument = l[1].strip()
-                    name = l[2].strip()
-                    mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
-                    if json.loads(myrecv(self.s))["status"] == "failure":
-                        self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"
-                    else:
-                        self.out_msg +="Success! MIDI saved!"
-                        self.out_msg +=("New creation:", json.loads(myrecv(self.s)["info"]))
+                    try:
+                        l = my_msg[1:].split(";")
+                        melody = l[0].strip()
+                        instrument = l[1].strip()
+                        name = l[2].strip()
+                        mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
+                        if json.loads(myrecv(self.s))["status"] == "failure":
+                            self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"
+                        else:
+                            self.out_msg +="Success! MIDI saved!"
+                            self.out_msg +=("New creation:", json.loads(myrecv(self.s)["info"]))
+                    except:
+                        self.out_msg += "Enter in required format."
+                        self.out_msg += original
                 elif my_msg == 'back':
                     self.state =S_LOGGEDIN
                 else:
                     self.out_msg += original
-            else: 
-                out_msg += original
+            
             if self.state == S_LOGGEDIN:
                 self.out_msg += menu
             
