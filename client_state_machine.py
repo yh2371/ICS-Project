@@ -82,11 +82,11 @@ class ClientSM:
                         self.state = S_CHATTING
                         self.out_msg += 'Connect to ' + peer + '. Chat away!\n\n'
                         self.out_msg += '-----------------------------------\n'
-                    else:
-                        self.out_msg += 'Connection unsuccessful\n'
-                        self.out_msg += 'New fundtion : Music Sharing\n'
+                        self.out_msg += 'New function : Music Sharing\n'
                         self.out_msg += 'Enter "share original" to share original music in the group;\n'
                         self.out_msg += 'Enter "share demo" to share demo music in the group;\n'
+                    else:
+                        self.out_msg += 'Connection unsuccessful\n'
 
                 elif my_msg[0] == '?':
                     term = my_msg[1:].strip()

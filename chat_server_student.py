@@ -213,11 +213,11 @@ class Server:
                        
             elif msg["action"] == "original":
                 from_name = self.logged_sock2name[from_sock]
+                the_guys = self.group.list_me(from_name)[1:]
                 for g in the_guys:
                     to_sock = self.logged_name2sock[g]
                     mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you..."}))
                 index = int(msg["number"]) - 1
-                the_guys = self.group.list_me(from_name)[1:]
                 try:
                     info = self.original[index].split(";")
                     name = info[1]
@@ -240,6 +240,7 @@ class Server:
             elif msg["action"] == "demo":
                 from_name = self.logged_sock2name[from_sock]
                 index = int(msg["number"])
+                the_guys = self.group.list_me(from_name)[1:]
                 for g in the_guys:
                     to_sock = self.logged_name2sock[g]
                     mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you..."}))
