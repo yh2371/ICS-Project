@@ -193,9 +193,10 @@ class ClientSM:
                         mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
                         if json.loads(myrecv(self.s))["status"] == "failure":
                             self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"
-                        else:
-                            self.out_msg +="Success! MIDI saved!"
-                            self.out_msg +=("New creation:", json.loads(myrecv(self.s)["info"]))
+                        elif json.loads(myrecv(self.s))["status"] == "success":
+                            self.out_msg += "Success! MIDI saved!"
+                            self.out_msg += "New creation:\n" 
+                            #self.out_msg += json.loads(myrecv(self.s)["info"])
                     except:
                         self.out_msg += "Enter in required format."
                         self.out_msg += original
@@ -208,27 +209,32 @@ class ClientSM:
                 self.out_msg += menu
             
         elif self.state == S_CHATTING_O:
-            f = open("creations.txt", r)
-            self.out_msg += "++++++Archive of original music is shown below:\n"
-            self.out_msg += f.read()
+            f = open("creations.txt", 'r')
+            
+            content = f.read()
             f.close()
-            if my_msg.isdigit():
-                mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": number}))
-                if json.loads(myrecv(self.s))["status"] == "failure":
-                    self.out_msg += "ERROR. Unable to send the original music. Try again.\n"
-                else:
-                    self.out_msg += "Success! Original sent!"
+            if len(my_msg)>0:
+                if my_msg.isdigit():
+                    self.out_msg += "++++++Archive of original music is shown below:\n"
+                    self.out_msg += content
+                    mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": my_msg.strip()}))
+                    if json.loads(myrecv(self.s))["status"] == "failure":
+                        self.out_msg += "ERROR. Unable to send the original music. Try again.\n"
+                    else:
+                        self.out_msg += "Success! Original sent!"
                 
                 
         elif self.state == S_CHATTING_D:
-            self.out_msg +="++++++Archive of demo music is shown below:\n"
-            self.out_msg += archive
-            if my_msg.isdigit():
-                mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": number}))
-                if json.loads(myrecv(self.s))["status"] == "failure":
-                    self.out_msg += "ERROR. Unable to send the demo music. Try again.\n"
-                else:
-                    self.out_msg += "Success! Demo sent!"
+            
+            if len(my_msg)>0:
+                if my_msg.isdigit():
+                    self.out_msg +="++++++Archive of demo music is shown below:\n"
+                    self.out_msg += archive
+                    mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": my_msg.strip()}))
+                    if json.loads(myrecv(self.s))["status"] == "failure":
+                        self.out_msg += "ERROR. Unable to send the demo music. Try again.\n"
+                    else:
+                        self.out_msg += "Success! Demo sent!"
 
 #==============================================================================
 # invalid state
