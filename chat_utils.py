@@ -88,6 +88,9 @@ S_OFFLINE   = 0
 S_CONNECTED = 1
 S_LOGGEDIN  = 2
 S_CHATTING  = 3
+S_MUSIC = 4
+S_CHATTING_O = 5
+S_CHATTING_D = 6
 
 SIZE_SPEC = 5
 
@@ -103,6 +106,12 @@ def print_state(state):
         print('Logged in')
     elif state == S_CHATTING:
         print('Chatting')
+    elif state == S_MUSIC:
+        print('Music')
+    elif state == S_CHATTING_O:
+        print('Sharing Original')
+    elif state == S_CHATTING_D:
+        print("Sharing Demo")
     else:
         print('Error: wrong state')
 
