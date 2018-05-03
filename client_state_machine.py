@@ -189,37 +189,34 @@ class ClientSM:
                     name = l[2].strip()
                     mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
                     if json.loads(myrecv(self.s))["status"] == "failure":
-                        self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n")
+                        self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"
                     else:
-                        self.out_msg +="Success! MIDI saved!")
+                        self.out_msg +="Success! MIDI saved!"
                         self.out_msg +=("New creation:", json.loads(myrecv(self.s)["info"]))
                 elif my_msg == 'back':
                     self.state =S_LOGGEDIN
             elif self.state == S_CHATTING_O:
                 f = open("creations.txt", r)
-                self.out_msg += "++++++Archive of original music is shown below:\n")
+                self.out_msg += "++++++Archive of original music is shown below:\n"
                 self.out_msg += f.read()
                 f.close()
-                try int(my_msg).isdigit():
+                if my_msg.isdigit():
                     mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": number}))
                     if json.loads(myrecv(self.s))["status"] == "failure":
                         self.out_msg += "ERROR. Unable to send the original music. Try again.\n"
                     else:
                         self.out_msg += "Success! Original sent!"
-                except:
-                    self.out_msg += "Enter Numbers"
+                
                 
             elif self.state == S_CHATTING_D:
                 self.out_msg +="++++++Archive of demo music is shown below:\n"
                 self.out_msg += archive
-                try int(my_msg).isdigit():
+                if my_msg.isdigit():
                     mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": number}))
                     if json.loads(myrecv(self.s))["status"] == "failure":
                         self.out_msg += "ERROR. Unable to send the demo music. Try again.\n"
                     else:
                         self.out_msg += "Success! Demo sent!"
-                except:
-                    self.out_msg += "Enter Numbers"
 
 #==============================================================================
 # invalid state
