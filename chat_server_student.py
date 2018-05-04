@@ -199,7 +199,9 @@ class Server:
                     midi = music_maker.create_midi(notes, instrument)
                     f = open("creations.txt", "r")
                     content = f.read()
-                    lines = f.readlines()
+                    lines = f.read()
+                    lines = lines.split("\n")
+                    print(len(lines))
                     i = len(lines) + 1
                     content += (str(i) + "; " + name + "; " + from_name + "; " + instrument + "; " + melody + "\n")
                     f.close()
@@ -209,7 +211,8 @@ class Server:
                     mysend(from_sock, json.dumps({"action": "create", "status": "failure"}))
                     
                 else:
-                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "info": content, "name": name}))
+                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "name": name}))  
+
                        
             elif msg["action"] == "original":
                 from_name = self.logged_sock2name[from_sock]
@@ -218,13 +221,14 @@ class Server:
                     to_sock = self.logged_name2sock[g]
                     mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you..."}))
                 index = int(msg["number"]) - 1
+
                 try:
                     info = self.original[index].split(";")
                     name = info[1]
                     author = info[2]
                     note = info[4].strip().split(",")
                     instrument = info[3].strip()
-                    midi = music_maker.create_midi(notes, instrument)
+                    midi = music_maker.create_midi(note, instrument)
                     info = [name, author, instrument, note]
                 except:
                     mysend(from_sock, json.dumps({"action": "original", "status": "failure"}))
@@ -257,7 +261,7 @@ class Server:
                     mysend(from_sock, json.dumps({"action": "demo", "status": "failure"}))
                     for g in the_guys:
                         to_sock = self.logged_name2sock[g]
-                        mysend(to_sock, json.dumps({"action" : "original", "status": "failure", "from": from_name}))
+                        mysend(to_sock, json.dumps({"action" : "demo", "status": "failure", "from": from_name}))
                 else:
                     mysend(from_sock, json.dumps({"action": "demo", "status": "success", "info": info}))
                     for g in the_guys:

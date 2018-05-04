@@ -48,7 +48,8 @@ def create_note_matrix(start, end, note, vel):
             m[:,i] = np.matrix(l[i]).T
     return m
 
-def create_midi(melody, instrument = "Acoustic Grand Piano", music = pretty_midi.PrettyMIDI()):
+def create_midi(melody, instrument = "Acoustic Grand Piano"):
+    music = pretty_midi.PrettyMIDI()
     program = pretty_midi.instrument_name_to_program(instrument)
     track = pretty_midi.Instrument(program)
     

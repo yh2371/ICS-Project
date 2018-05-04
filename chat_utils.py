@@ -26,7 +26,8 @@ archive = "\n++++ Choose from one of the following existing demo melodies (Song 
         2: Wo Huai Nian De, Sun Yanzi, Acoustic Grand Piano\n \
         3: Twinkle Twinkle Little Star, ---, Cello\n \
         4: Thanks, Seventeen, Flute\n \
-        5: NYU Shanghai Alma Mater, NYU Shanghai, Voice Oohs\n\n"    
+        5: NYU Shanghai Alma Mater, NYU Shanghai, Voice Oohs\n \
+        cancel: to cancel music sharing\n\n"
         
 original = "\n++++ Choose one of the following commands\n \
         i: view instruments\n \
