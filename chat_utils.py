@@ -26,14 +26,13 @@ archive = "\n++++ Choose from one of the following existing demo melodies (Song 
         2: Wo Huai Nian De, Sun Yanzi, Acoustic Grand Piano\n \
         3: Twinkle Twinkle Little Star, ---, Cello\n \
         4: Thanks, Seventeen, Flute\n \
-        5: NYU Shanghai Alma Mater, NYU Shanghai, Voice Oohs\n \
-        cancel: to cancel music sharing\n\n"
-        
+        5: NYU Shanghai Alma Mater, NYU Shanghai, Voice Oohs\n\n"
+    
 original = "\n++++ Choose one of the following commands\n \
         i: view instruments\n \
         k: view keyboard\n \
         w __note names(separated by commas); instrument name; name of melody__: write melody, eg: w C4,D5,D7; Music Box; Test\n \
-        back: return to menu\n\n"
+        back: to go back to main menu\n\n"
 
 instruments = "\n++++Commonly used intruments are shown as following\n \
         ****NOTE: There are a total of 128 instruments available. However, for your convenience, not all are included in the following****\n \

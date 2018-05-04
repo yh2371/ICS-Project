@@ -40,9 +40,6 @@ class Server:
         self.demo = self.demo_f.readlines()
         self.demo_f.close()
         
-        self.original_f = open("creations.txt", "r")
-        self.original = self.original_f.readlines()
-        self.original_f.close()
 
     def new_client(self, sock):
         #add to all sockets and to new clients
@@ -199,19 +196,20 @@ class Server:
                     midi = music_maker.create_midi(notes, instrument)
                     f = open("creations.txt", "r")
                     content = f.read()
-                    lines = f.read()
-                    lines = lines.split("\n")
+                    lines = content.split("\n")
+                    lines.pop()
                     print(len(lines))
                     i = len(lines) + 1
-                    content += (str(i) + "; " + name + "; " + from_name + "; " + instrument + "; " + melody + "\n")
+                    content += str(i) + "; " + name + "; " + from_name + "; " + instrument + "; " + melody + "\n"
                     f.close()
                     new_f = open("creations.txt", "w")
                     new_f.write(content)
+                    new_f.close()
+                    print("bye")
+                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "name": name}))
+                    print("hi")
                 except:
                     mysend(from_sock, json.dumps({"action": "create", "status": "failure"}))
-                    
-                else:
-                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "name": name}))  
 
                        
             elif msg["action"] == "original":
@@ -223,7 +221,10 @@ class Server:
                 index = int(msg["number"]) - 1
 
                 try:
-                    info = self.original[index].split(";")
+                    f = open("creations.txt", "r")
+                    original = f.readlines()
+                    f.close()
+                    info = original[index].split(";")
                     name = info[1]
                     author = info[2]
                     note = info[4].strip().split(",")
