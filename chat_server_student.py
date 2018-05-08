@@ -205,21 +205,21 @@ class Server:
                     new_f = open("creations.txt", "w")
                     new_f.write(content)
                     new_f.close()
-                    print("bye")
-                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "name": name}))
-                    print("hi")
+                    mysend(from_sock, json.dumps({"action": "create", "status": "success", "name": name,"info": "Song: "+name+", Author: "+from_name+", Instrument: "+instrument,"notes":notes,"instrument":instrument}))
                 except:
                     mysend(from_sock, json.dumps({"action": "create", "status": "failure"}))
 
-                       
-            elif msg["action"] == "original":
+            elif msg["action"] == "share":
                 from_name = self.logged_sock2name[from_sock]
                 the_guys = self.group.list_me(from_name)[1:]
                 for g in the_guys:
                     to_sock = self.logged_name2sock[g]
-                    mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you..."}))
+                    mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you...\n\nProcessing...\n"}))
+            
+            elif msg["action"] == "original":
+                from_name = self.logged_sock2name[from_sock]
+                the_guys = self.group.list_me(from_name)[1:]
                 index = int(msg["number"]) - 1
-
                 try:
                     f = open("creations.txt", "r")
                     original = f.readlines()
@@ -244,11 +244,8 @@ class Server:
                     
             elif msg["action"] == "demo":
                 from_name = self.logged_sock2name[from_sock]
-                index = int(msg["number"])
                 the_guys = self.group.list_me(from_name)[1:]
-                for g in the_guys:
-                    to_sock = self.logged_name2sock[g]
-                    mysend(to_sock, json.dumps({"action" : "exchange", "from": from_name, "message" : from_name + " is trying to share music with you..."}))
+                index = int(msg["number"])
                 try:
                     info = self.demo[index].split(";")
                     name = info[0]

@@ -135,18 +135,22 @@ class ClientSM:
                     self.state = S_LOGGEDIN
                     self.peer = ''
                 elif my_msg == "share original":
-                    self.out_msg += "Entering music sharing\n"
+                    self.state = S_CHATTING_O
+                    mysend(self.s, json.dumps({"action": "share", "from": self.me }))
+                    self.out_msg += "Entering music sharing...\n"
+                    self.out_msg += "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
                     self.out_msg += "++++++Archive of original music is shown below:\n"
                     f = open("creations.txt", "r")   
                     content = f.read()
                     f.close()
                     self.out_msg += content
-                    self.state = S_CHATTING_O
                     
                     
                 elif my_msg == "share demo": 
                     self.state = S_CHATTING_D
-                    self.out_msg += "Entering music sharing\n"
+                    mysend(self.s, json.dumps({"action": "share", "from": self.me }))
+                    self.out_msg += "Entering music sharing...\n"
+                    self.out_msg += "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
                     self.out_msg +="++++++Archive of demo music is shown below:\n"
                     self.out_msg += archive
                     
@@ -164,6 +168,7 @@ class ClientSM:
                         self.out_msg += "You have successfully recieved " + info[0] + ".mid created by " + info[1] + " from " + peer_msg["from"] + "! Please check your directory!\n"
                     else:
                         self.out_msg += "Error: MIDI file was not successfully recieved!\n"
+                    self.out_msg += "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"
                 elif peer_msg["action"] == "demo":
                     if peer_msg["status"] == "success":
                         info = peer_msg["info"]
@@ -171,7 +176,8 @@ class ClientSM:
                         music_maker.save(midi, info[0] + ".mid")
                         self.out_msg += "You have successfully recieved " + info[0] + ".mid from " + peer_msg["from"] + "! Please check your directory!\n"
                     else:
-                        self.out_msg += "Error: MIDI file was not successfully recieved!\n"
+                        self.out_msg += "Error: MIDI file was not successfully recieved!\n\n"
+                    self.out_msg += "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"
                 else:
                     self.out_msg += peer_msg["from"] + ": " + peer_msg["message"]
                    
@@ -184,7 +190,6 @@ class ClientSM:
         elif self.state == S_MUSIC:
             
             if len(my_msg) > 0:
-                self.out_msg += original
                 if my_msg == "i":
                     self.out_msg += instruments
                 elif my_msg == "k":
@@ -197,17 +202,26 @@ class ClientSM:
                         name = l[2].strip()
                         mysend(self.s, json.dumps({"action":"create", "melody" : melody, "instrument": instrument, "name": name}))
                         recv = json.loads(myrecv(self.s))
+                        notes, instrument, name= recv["notes"], recv["instrument"], recv["name"]
+                        midi = music_maker.create_midi(notes, instrument)
+                        music_maker.save(midi, name+".mid")
                         if recv["status"] == "failure":
-                            self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n"  
+                            self.out_msg +="ERROR: Unable to create MIDI. Please try again.\n\n"  
                         else:
-                            self.out_msg += "Success! MIDI saved!\n"
-                            self.out_msg += "New creation:\n" 
-                            self.out_msg += recv["info"]
+                            self.out_msg += "Success! MIDI saved!\n\n"
+                            self.out_msg += "New creation:\n"
+                            self.out_msg += recv["info"] + "\n\n"
+                            self.out_msg += "Please look for " + name +".mid in your directory!\n\n"
                     except:
-                        self.out_msg += "Enter in required format."
+                        self.out_msg += "Enter in required format.\n\n"
                     self.state = S_LOGGEDIN
                 elif my_msg == "back":
                     self.state = S_LOGGEDIN
+                else:
+                    self.out_msg += original
+            
+            if self.state == S_LOGGEDIN:
+                self.out_msg += menu
                     
             
         elif self.state == S_CHATTING_O:
@@ -215,28 +229,29 @@ class ClientSM:
                 if my_msg.isdigit():
                     mysend(self.s, json.dumps({"action": "original", "from": "[" + self.me + "]", "number": my_msg.strip()}))
                     if json.loads(myrecv(self.s))["status"] == "failure":
-                        self.out_msg += "ERROR. Unable to send the original music. Try again.\n"
+                        self.out_msg += "ERROR. Unable to send the original music. Try again.\n\n"
                     else:
-                        self.out_msg += "Success! Original sent!\n"
+                        self.out_msg += "Success! Original sent!\n\n"
                 else:
-                    self.out_msg += "Please enter numbers!\n"
-                self.out_msg += "Leaving music sharing\n"
+                    self.out_msg += "Please enter numbers!\n\n"
+                self.out_msg += "Leaving music sharing...\n"
+                self.out_msg += "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"
                 self.state = S_CHATTING
                 
                 
         elif self.state == S_CHATTING_D:
             if len(my_msg)>0:
-                
                 if my_msg.isdigit():
                     mysend(self.s, json.dumps({"action": "demo", "from": "[" + self.me + "]", "number": my_msg.strip()}))
                     if json.loads(myrecv(self.s))["status"] == "failure":
-                        self.out_msg += "ERROR. Unable to send the demo music. Try again.\n"
+                        self.out_msg += "ERROR. Unable to send the demo music. Try again.\n\n"
                     else:
-                        self.out_msg += "Success! Demo sent!\n"
+                        self.out_msg += "Success! Demo sent!\n\n"
                 
                 else:
-                    self.out_msg += "Please enter numbers!\n"
-                self.out_msg += "Leaving music sharing\n"
+                    self.out_msg += "Please enter numbers!\n\n"
+                self.out_msg += "Leaving music sharing...\n"
+                self.out_msg += "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"
                 self.state = S_CHATTING
 
 #==============================================================================
